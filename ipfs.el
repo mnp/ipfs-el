@@ -14,11 +14,50 @@
 ;; Addressing and what it means documented here
 ;; https://github.com/ipfs/in-web-browsers/blob/master/ADDRESSING.md
 
+(defvar ipfs-upstream-url "https://melpa.org/packages/archive-contents")
 (defvar ipfs-cid-protocol "ipfs://")
 (defvar ipfs-ipns-protocol "ipns://")
 
-(custom-set-variables '(url-handler-regexp
-                        "\\`\\(https?\\|ipfs\\|ipns\\|ftp\\|file\\|nfs\\|ssh\\|scp\\|rsync\\|telnet\\)://"))
+(defvar ipfs-daemon-url "http://127.0.0.1:5001/"
+  "The daemon usually runs locally.")
+
+(defconst ipfs-boundary "---2a8ae6ad-f4ad-4d9a-a92c-6d217011fe0f---")
+
+(defun ipfs-fetch-upstream ()
+  (with-current-buffer
+      (url-https
+       (url-generic-parse-url ipfs-upstream-url)
+       (lambda (x)
+         (goto-char (point-min))
+         (re-search-forward "\n\n")
+         (let ((tmp (read (current-buffer))))
+           (if (eq 1 (car tmp))
+               (progn 
+                 (message "Retrieved %s packages from %s" (length tmp) ipfs-upstream-url)
+                 (setq ipfs-archive-contents tmp))
+             (error "Bad read from %s" ipfs-upstream-url))))
+       nil))
+  t)
+(ipfs-fetch-upstream)
+
+
+; ipfs-archive-contents 
+
+
+
+; (mapc 'kill-buffer (seq-filter (lambda (x) (string-match-p "melpa" (buffer-name x)))
+;                                (buffer-list)))
+
+
+;; works 
+;; (ipfs-fetch-upstream)
+;; (mapcar 'car ipfs-archive-contents)
+
+
+
+; MAYBE
+; (custom-set-variables '(url-handler-regexp
+;                        "\\`\\(https?\\|ipfs\\|ipns\\|ftp\\|file\\|nfs\\|ssh\\|scp\\|rsync\\|telnet\\)://"))
 
 ; (url-handler-mode 1)
 ; (find-file "https://example.com")
@@ -35,11 +74,6 @@
 
 url-file-handlers
 
-
-(defvar ipfs-daemon-url "http://127.0.0.1:5001/"
-  "The daemon usually runs locally.")
-
-(defconst ipfs-boundary "---2a8ae6ad-f4ad-4d9a-a92c-6d217011fe0f---")
 
 (defun my-switch-to-url-buffer (status)
   "Switch to the buffer returned by `url-retreive'.
@@ -106,7 +140,6 @@ http://example.com
 ; Date: Mon, 18 May 2020 13:24:30 GMT
 ; Transfer-Encoding: chunked
 ; " 200)
-
 
 
 

@@ -1,15 +1,42 @@
-# Elisp Interface to IPFS daemon HTTP Protocol
+# Emacs Elisp Interface to IPFS
 
-A few experiments interfacing with an IPFS daemon over its HTTP
-protocol. We just want a few calls from
-https://docs.ipfs.io/guides/concepts/dht really.
+## Retrieve objects
+This package allows Emacs to retrieve IPFS and IPNS objects over the
+[HTTP API protocol](https://docs.ipfs.io/reference/api/http) or from
+[IPFS HTTP Gateways](https://ipfs.github.io/public-gateway-checker/).
 
-## Application Thoughts
+You can either run your own daemon locally or use a public gateway. The code will try local first.
 
-One application might include stuctured programming by storing either
-bytecode or lisp as content addressable objects. My term for this is
-the old ClearCase term of "wink-in", or derived object, storage.
+If you're running [your own daemon locally](https://github.com/ipfs/go-ipfs) which is also easy to do now
+[with a Docker container](https://hub.docker.com/r/ipfs/go-ipfs), it's assumed to be http://127.0.0.1:5001.
 
-Another can be an IPFS elpa/melpa package implementation. Package
-managers are a current focus of the IPFS team, which it's especially
-well suited for.
+## Publish Objects
+
+to be written
+
+## Package Manager
+
+This is also an IPFS ELPA/MELPA package implementation. Package managers are a
+current focus of the IPFS team, which it's especially well suited for.
+This will be the initial focus of this project.
+
+# Roadmap
+
+Package Index Publishing
+
+- [x] Initial experiments and learning
+- [x] Retrieve the current public Melpa archive-contents and publish to default IPNS name
+- [ ] Determine an IPNS key management plan
+- [ ] Support other repos like ELPA
+
+Package Publishing
+- [ ] Fork https://github.com/melpa/package-build to pull packages git and publish each to IPFS
+- [ ] Augment the archive-contents structure to hold IPFS CIDs to each package
+
+Emacs packackage - ideally provide only a package, defadvice and hooks, no patching of existing packages
+
+- [ ] Add an ipns:// and ipfs:// URL scheme for retrieving
+- [ ] Investigate what web3:// would mean
+- [ ] `package-list`: resolve IPNS name and pull archive-contents from IPFS
+- [ ] `package-install`: pull selected packages from IPFS
+

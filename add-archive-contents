@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+#
+# Import current MELPA package index into IPFS
+#
+# TODO - manage keys
+#
+
+set -euo pipefail
+
+url=https://melpa.org/packages/archive-contents
+
+cid=$(curl -s $url | ipfs add -q --)
+
+ipfs name publish $cid
+
+# This takes a few minutes. It outputs:
+# Published to QmPZvkXQetuk9JFb2GmaLNsBwDhnPBY566Yb3ooVDrHGrM: /ipfs/QmYTKXX6m5rMiqZv3hv8s68PQHV92HiVzNMrT3E3Xd6Mn1
+
