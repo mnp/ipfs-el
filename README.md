@@ -22,7 +22,7 @@ Following existing `url` package access patterns, synchronous and asynchronous v
 
 See also [implementation doc](https://github.com/ipfs/go-ipfs/blob/master/docs/implement-api-bindings.md).
 
-## Retrieve Via Gateway
+## Retrieve Via Gateway - Read Only
 
 See variable `ipfs-public-gateway`.
 
