@@ -1,5 +1,7 @@
 # Emacs IPFS Project
 
+[![badge](https://img.shields.io/badge/maturity-ideation-yellow.svg)](https://shields.io/)
+
 This project will create an Elisp package `ipfs-el` to access IPFS nodes, both with the [IPFS API
 protocol](https://docs.ipfs.io/reference/api/http) as well as [retrieve-only HTTP
 gateways](https://ipfs.github.io/public-gateway-checker/) for convenience. `ipfs-el` will also aim to
@@ -70,6 +72,7 @@ CID and be de-duped. Explore in Elisp.
 Package Index Publishing
 
 - [x] Initial experiments and learning
+- [ ] Consider [Eldev](https://github.com/doublep/eldev) as a foundation instead of `Package`.
 - [x] Retrieve the current public Melpa archive-contents and publish to default IPNS name
 - [ ] Determine an IPNS key management plan
 - [ ] Support other repos like ELPA

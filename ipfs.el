@@ -8,34 +8,25 @@
 ;; TODO: package.el archive hooks
 ;; TODO: Augment or reformat?: melpa.org/packages/archive-contents file, created by melpa repo Makefile
 
-(require 'url-http)   ; ?
+(require 'url-http)
 (require 'json)
 
 ;; Addressing and what it means documented here
 ;; https://github.com/ipfs/in-web-browsers/blob/master/ADDRESSING.md
 
-(defvar ipfs-upstream-url "https://melpa.org/packages/archive-contents")
-(defvar ipfs-cid-protocol "ipfs://")
-(defvar ipfs-ipns-protocol "ipns://")
-
-(defvar ipfs-daemon-url "http://127.0.0.1:5001/"
+(defvar ipfs-node-url "http://127.0.0.1:5001"
   "The daemon usually runs locally.")
+
+(defvar ipfs-public-gateway-url "https://ipfs.io"
+  "Public IPFS gateway used if `ipfs-node-url` is not reachable. Read only.")
+
+(defvar ipfs-cid-protocol "ipfs://")
+
+(defvar ipfs-ipns-protocol "ipns://")
 
 (defconst ipfs-boundary "---2a8ae6ad-f4ad-4d9a-a92c-6d217011fe0f---")
 
-(defun ipfs-fetch-upstream ()
-  "Retreive upstream archive-contents and return it as a list."
-  (with-current-buffer
-    (url-retrieve-synchronously ipfs-upstream-url)
-    (goto-char (point-min))
-    (re-search-forward "^$")
-    (let ((fetched (read (current-buffer))))
-      (kill-buffer (current-buffer))
-      (if (and fetched (listp fetched) (eq 1 (car fetched)))
-          (progn 
-            (message "Retrieved %s packages from %s" (length (cdr fetched)) ipfs-upstream-url)
-            fetched)
-        (error "Bad read from %s" ipfs-upstream-url)))))
+
 
 ;; works 
 ;; (mapcar 'car (car (ipfs-fetch-upstream)))
@@ -107,7 +98,7 @@ package-archives
 ;"http://127.0.0.1:5001/api/v0/swarm/disconnect?arg=/ip4/54.93.113.247/tcp/48131/ipfs/QmUDS3nsBD1X4XK5Jo836fed7SErTyTuQzRqWaiQAyBYMP"))
 
 (defun ipfs-get-api (path)
-  (ipfs-get-url (concat ipfs-daemon-url path)))
+  (ipfs-get-url (concat ipfs-node-url path)))
 
 (defun ipfs-get-url (url)
   (let ((url-request-method "POST"))
@@ -208,10 +199,24 @@ Debugger entered--Lisp error: (file-error "make client process failed" "Connecti
 ; " 200)
 
 
+
+;; Package Manager
+ 
+(defvar ipfs-upstream-url "https://melpa.org/packages/archive-contents"
+  "Location of upstream package index.")
 
-
-
-
-
-
-(http-post-encode-multipart-data nil q
+(defun ipfs-fetch-upstream ()
+  "Retreive upstream archive-contents and return it as a list."
+  (with-current-buffer
+    (url-retrieve-synchronously ipfs-upstream-url)
+    (goto-char (point-min))
+    (re-search-forward "^$")
+    (let ((fetched (read (current-buffer))))
+      (kill-buffer (current-buffer))
+      (if (and fetched (listp fetched) (eq 1 (car fetched)))
+          (progn 
+            (message "Retrieved %s packages from %s" (length (cdr fetched)) ipfs-upstream-url)
+            fetched)
+        (error "Bad read from %s" ipfs-upstream-url)))))
+                                 
+(provide 'ipfs)
