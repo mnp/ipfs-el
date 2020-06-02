@@ -41,18 +41,18 @@ TBD: An IPFS name publish would make sense, eg, for a document, which will imply
 
 # Applications to Explore
 
+## Org mode link handling
+
+Links in org mode are subject to edit, rot, etc. Supporting an ipfs://
+link type may be the killer app allowing whole org trees to be
+retrieved with graph-sync, or just referred to.
+
 ## Package Manager
 
 This is also an IPFS ELPA/MELPA
 [package implementation](https://www.gnu.org/software/emacs/manual/html_node/elisp/Package-Archives.html#Package-Archives).
 Package managers are a current focus of the IPFS team, which it's especially well suited for.
 This will be the initial focus of this project.
-
-## Org mode link handling
-
-Links in org mode are subject to edit, rot, etc. Supporting an ipfs://
-link type may be the killer app allowing whole org trees to be
-retrieved with graph-sync, or just referred to.
 
 ## Structured Programming
 
@@ -62,12 +62,14 @@ CID and be de-duped. Explore in Elisp.
 
 # Roadmap
 
-`ipfs-el` Emacs packackage - ideally provide only a package, defadvice and hooks, no patching of existing packages
+`ipfs-el` Emacs package - ideally provide only a package, defadvice and hooks, no patching of existing packages
 
 - [ ] Add an ipns:// and ipfs:// URL scheme for retrieving
 - [ ] Investigate what web3:// would mean
 - [ ] `package-list`: resolve IPNS name and pull archive-contents from IPFS
 - [ ] `package-install`: pull selected packages from IPFS
+- [ ] magic file types
+- [ ] org-mode links
 
 Package Index Publishing
 
@@ -81,6 +83,8 @@ Package Publishing
 - [ ] Fork https://github.com/melpa/package-build to pull packages git and publish each to IPFS
 - [ ] Augment the archive-contents structure to hold IPFS CIDs to each package
 
+Structured Programming
+- [ ] Idea generation
 
 -----
 
