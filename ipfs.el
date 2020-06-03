@@ -8,11 +8,9 @@
 ;; TODO: package.el archive hooks
 ;; TODO: Augment or reformat?: melpa.org/packages/archive-contents file, created by melpa repo Makefile
 
+(require 'http-post-simple)
 (require 'url-http)
 (require 'json)
-
-;; Addressing and what it means documented here
-;; https://github.com/ipfs/in-web-browsers/blob/master/ADDRESSING.md
 
 (defvar ipfs-node-url "http://127.0.0.1:5001"
   "The daemon usually runs locally.")
@@ -24,43 +22,40 @@
 
 (defvar ipfs-ipns-protocol "ipns://")
 
-(defconst ipfs-boundary "---2a8ae6ad-f4ad-4d9a-a92c-6d217011fe0f---")
+(defun ipfs-api-synchronous (command fields files)
+  "Performs a synchronous POST and returns a list of response (either JSON or text like from a `/cat`),
+  headers, and HTTP result code."
+  (http-post-simple-multipart   
+   (concat ipfs-node-url "/api/v0/" command)
+   fields
+   files))
 
+(defun ipfs-api-json (command fields files)
+  (json-read-from-string (car (ipfs-api-synchronous command fields files))))
 
-(defun my-switch-to-url-buffer (status)
-  "Switch to the buffer returned by `url-retreive'.
-    The buffer contains the raw HTTP response sent by the server."
-  (switch-to-buffer (current-buffer)))
+(defun ipfs-api-text (command fields files)
+  (car (ipfs-api-synchronous command fields files)))
 
-;"http://127.0.0.1:5001/api/v0/version"
-;"http://127.0.0.1:5001/api/v0/swarm/disconnect?arg=/ip4/54.93.113.247/tcp/48131/ipfs/QmUDS3nsBD1X4XK5Jo836fed7SErTyTuQzRqWaiQAyBYMP"))
+
+;;; API Commands. Defuns for now but they could become defmacros.
 
-(defun ipfs-get-url-synchronous (url)
-  (let ((url-request-method "POST"))
-    (with-current-buffer (url-retrieve-synchronously url)
- (cadr (split-string (buffer-string) "\n\n")))))
+(defun ipfs-cat (cid)
+  "Returns string if object at CID is a file."
+  (ipfs-api-text "cat" `((arg . ,cid)) nil))
 
-(defun ipfs-cat-synchronous (cid)
-  (ipfs-get-url-synchronous (concat ipfs-node-url "/api/v0/cat?arg=" cid)))
+(defun ipfs-version ()
+  "Returns list alis of Version, Commit, Repo, System, Golang"
+  (ipfs-api-json "version" nil nil))
 
-(defun ipfs-version-synchronous ()
-  (ipfs-get-url-synchronous (concat ipfs-node-url "/api/v0/version")))
+(defun ipfs-add-string (str)
+  "Returns hash of newly added string."
+  (ipfs-api-json "add" `((path . str)) nil))
 
-(defun ipfs-add-synchronous (body)
-  (let* ((url-request-method "POST")
-         (url-request-extra-headers `(("Content-Type" . ,(concat "Content-Type: multipart/form-data; boundary=" ipfs-boundary))))
-         (url (concat ipfs-daemon-url "api/v0/add")))
-    (with-current-buffer (url-retrieve-synchronously url)
-      (read-from-string (cadr (split-string (buffer-string) "\n\n"))))))
+(defun ipfs-stat (cid)
+  "Examines object at CID and returns alist with keys `Hash`, `NumLinks`, `BlockSize`, `LinkSize`, `DataSize`, and `CumulativeSize`."
+  (ipfs-api-json-synchronous "object/stat" `((arg . ,cid)) nil))
 
-(ipfs-add-synchronous "pants")
-
-
-; ok  (ipfs-get-api "/api/v0/cat?arg=QmZULkCELmmk5XNfCgTnCyFgAVxBRBXyDHGGMVoLFLiXEN")
-
-; works
-;(let ((ipfs-node-url ipfs-public-gateway-url))
-; (ipfs-get-api "/api/v0/cat?arg=QmZULkCELmmk5XNfCgTnCyFgAVxBRBXyDHGGMVoLFLiXEN"))
+;; ... etc TODO ...
 
 ;(unwind-protect
 ;    (url-retrieve "http://127.0.0.1:5088/")
@@ -68,16 +63,6 @@
 ;
 ; ok(ipfs-get-api "/api/v0/cat?arg=QmVeAzDB73nzB8aYrTtkrqQfPKxEr56jPfTVB21UsdNAMp")
 
-(defun ipfs-add-string (str)
-  (http-post-simple-multipart   
-   (concat ipfs-daemon-url "api/v0/add")
-   nil
-   (list (list "path" "ipfs.el" "text/plain" str))))
-
-
-;; works
-;;
-; (ipfs-add-string "bleh")
 
 ;; works
 ;; (byte-compile 'ipfs-get-url)
@@ -154,7 +139,6 @@ the arguments that would have been passed to OPERATION."
  
 (defvar ipfs-upstream-url "https://melpa.org/packages/archive-contents"
   "Location of upstream package index.")
-
 
 (defun ipfs-fetch-upstream ()
   "Retreive upstream archive-contents and return it as a list."

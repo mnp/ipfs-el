@@ -86,6 +86,20 @@ Package Publishing
 Structured Programming
 - [ ] Idea generation
 
+
+# Other Resources
+
+## URL
+Many hooks and internals we may need to operate with: https://www.gnu.org/software/emacs/manual/html_mono/url.html
+
+First good trick is to enable debugging like this `(let ((url-debug t)) (ipfs-add-string "foo"))` and then look in `*URL_DEBUG*` buffer for details.
+
+## Addressing conventions
+
+ https://github.com/ipfs/in-web-browsers/blob/master/ADDRESSING.md
+
+
+
 -----
 
 *Sic itur ad astra*
