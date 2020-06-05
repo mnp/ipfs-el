@@ -1,6 +1,7 @@
 ;; -*- Lisp-Interaction -*-
 ;; Requires internet connection and local IPFS node running on 5001 and 8080
 
+(require 'ert)
 (require 'ipfs)
 
 (defconst hello-cid "QmZULkCELmmk5XNfCgTnCyFgAVxBRBXyDHGGMVoLFLiXEN")

@@ -1,5 +1,6 @@
 ;; -*- Lisp-Interaction -*-
 
+(require 'ert)
 (require 'ipfs)
 
 ipfs-mode

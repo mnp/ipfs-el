@@ -29,5 +29,7 @@ jobs:
     # Runs a set of commands using the runners shell
     - name: Run a multi-line script
       run: |
-        sudo apt-get install -y emacs
-        echo test, and deploy your project.
+        sudo apt-get install -y emacs docker
+        docker run -d ipfs/go-ipfs
+        emacs --batch -L . -l run-all-tests.el -f ert-run-tests-batch-and-exit
+
