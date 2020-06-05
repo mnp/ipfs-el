@@ -53,7 +53,7 @@
 
 (defun ipfs-stat (cid)
   "Examines object at CID and returns alist with keys `Hash`, `NumLinks`, `BlockSize`, `LinkSize`, `DataSize`, and `CumulativeSize`."
-  (ipfs-api-json-synchronous "object/stat" `((arg . ,cid)) nil))
+  (ipfs-api-json "object/stat" `((arg . ,cid)) nil))
 
 ;; ... etc TODO ...
 
@@ -62,6 +62,19 @@
 ;    (url-retrieve "http://google.com" (lambda (status ) (message "callback %s" status)))
 ;
 ; ok(ipfs-get-api "/api/v0/cat?arg=QmVeAzDB73nzB8aYrTtkrqQfPKxEr56jPfTVB21UsdNAMp")
+
+; ;; file
+; (ipfs-stat "QmVeAzDB73nzB8aYrTtkrqQfPKxEr56jPfTVB21UsdNAMp")
+; ((Hash . "QmVeAzDB73nzB8aYrTtkrqQfPKxEr56jPfTVB21UsdNAMp") (NumLinks . 0) (BlockSize . 51) (LinksSize . 2) (DataSize . 49) (CumulativeSize . 51))
+; 
+; ;; directory 
+; (ipfs-stat "QmZAyK3gEk9guF2zPsr6S9X7PJ8Y56XvTeqtzKL9h3HpdN")
+; ((Hash . "QmZAyK3gEk9guF2zPsr6S9X7PJ8Y56XvTeqtzKL9h3HpdN") (NumLinks . 11) (BlockSize . 651) (LinksSize . 649) (DataSize . 2) (CumulativeSize . 1580429))
+
+
+;; TODO FIXME
+;; (ipfs-api-text "files/stat" '((path . "QmUPLMqRWm5u6GgfWb777wb9qLDc9RTQf5rqy1ymStMbaP")) nil)
+;; "argument \"path\" is required
 
 
 ;; works
@@ -110,29 +123,58 @@
 ;; (url-generic-parse-url  "http://127.0.0.1:5001/")
 ;; #s(url "http" nil nil "127.0.0.1" 5001 "/" nil nil t nil t t)
 
-(defconst ipfs-handler-regexp "\\(ipfs\\|ipns\\)://"
+(define-minor-mode ipfs-mode
+  "Toggle enabling of IPFS minor mode.
+     Interactively with no argument, this command toggles the mode.
+     A positive prefix argument enables the mode, any other prefix
+     argument disables it.  From Lisp, argument omitted or nil enables
+     the mode, `toggle' toggles the state.
+
+     When IFPS mode is enabled, file handlers are added for paths beginning with `/ipfs` and
+     `/ipns`. Disabling it removes the special handlers."
+  nil	      ;; The initial value.
+  "ipfs"      ;; The indicator for the mode line.
+  nil	      ;; The minor mode bindings.
+  :group 'ipfs
+  :after-hook (if dispwatch-mode
+		  (ipfs-enable)
+		  (ipfs-disable)))
+
+(defconst ipfs-file-handler-regexp "\\`/\\(ipfs\\|ipns\\)"
+  "IPFS and IPNS protocol path regexp")
+
+(defconst ipfs-url-handler-regexp "\\(ipfs\\|ipns\\)://"
   "IPFS and IPNS protocol URL regexp")
 
 (defun ipfs-file-handler (operation &rest args)
     "Function called from the `file-name-handler-alist' routines.
 OPERATION is what needs to be done (`file-exists-p', etc).  ARGS are
 the arguments that would have been passed to OPERATION."
-    (message "ipfs-file-handler got (%s %s)" operation args)
-    (cond ((eq operation 'insert-file-contents) (error "XX"))
-                       ;; Handle any operation we don't know about.
+    (message "ipfs-file-handler working on (%s %s)" operation args)
+
+    (let ((path (car args)))
+      (cond 
+          ;; TODO: &optional VISIT BEG END REPLACE
+          ((eq operation 'insert-file-contents) (ipfs-cat path))
+
           (t (let ((inhibit-file-name-handlers
                     (cons 'ipfs-file-handler
                           (and (eq inhibit-file-name-operation operation)
                                inhibit-file-name-handlers)))
                    (inhibit-file-name-operation operation))
-               (apply operation args)))))
+               (apply operation args))))))
 
-; (url-handler-mode 1)
-;(find-file "ipfs://a/b")
-;(file-exists-p "ipfs://a/b")
-;(file-attributes "ipfs://foo")
-;     (funcall #'ipfs-file-handler 'file-exists-p "xxx")
-;(access-file "ipfs://xxtmp" "x")
+;; works
+;; (insert-file-contents "/ipfs/QmVeAzDB73nzB8aYrTtkrqQfPKxEr56jPfTVB21UsdNAMp")
+
+
+(defun ipfs-enable ()
+  "Install IPFS magic file handlers."
+  (add-to-list 'file-name-handler-alist (cons ipfs-file-handler-regexp #'ipfs-file-handler)))
+
+(defun ipfs-disable ()
+  "Remove IPFS magic file handlers."
+  (delete (rassoc #'ipfs-file-handler file-name-handler-alist) file-name-handler-alist))
 
 
 ;;; Package Manager

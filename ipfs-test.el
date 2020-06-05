@@ -1,26 +1,39 @@
 ;; -*- Lisp-Interaction -*-
 
-(require 'ert)
-;(require 'ipfs)
-(setq eval-expression-debug-on-error nil
-      debug-on-error nil)
+(require 'ipfs)
 
-(ert-deftest synchronous-test ()
+ipfs-mode
 
-(should-error 
- (url-retrieve-synchronously "badurl")
+(ert-deftest enable-disable ()
+  (let ((saved ipfs-mode))
+    ;; start with none
+    (should (null (ipfs-mode -1)))
+    (should (null ipfs-mode))
 
-(error "Bad url: badurl")
+    (should (eq t (ipfs-mode 1)))
+    (should ipfs-mode)
+
+    ;; enable again
+    (should (eq t (ipfs-mode 1)))
+    (should ipfs-mode)
+
+    ;; disable should have none
+    (should (null (ipfs-mode -1)))
+    (should (null ipfs-mode))
+
+    ;; restore
+    (ipfs-mode (if saved 1 -1))))
 
 
-(unwind-protect
-    (url-retrieve-synchronously "http://xxx")
-  33)
-
-
-  
-
-
+; (setq eval-expression-debug-on-error nil
+;       debug-on-error nil)
+; 
+; (ert-deftest synchronous-test ()
+; 
+; (should-error 
+;  (url-retrieve-synchronously "badurl")
+; 
+; (error "Bad url: badurl")
 
 
 ;; "handle (error Bad url: foo)"
