@@ -31,4 +31,4 @@ jobs:
       run: |
         sudo apt-get install -y emacs docker
         docker run -d ipfs/go-ipfs
-       	emacs --batch -l run-all-tests.el  
+        emacs --batch -l run-all-tests.el  
