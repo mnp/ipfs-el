@@ -1,7 +1,10 @@
-(require 'package)
-;(setq debug-on-error t)
+;; Install some dependencies
 
 (add-to-list 'load-path default-directory)
+(setq package-user-dir default-directory)
+
+(require 'cl)
+(require 'package)
 
 ;; add melpa stable
 (add-to-list 'package-archives
@@ -15,7 +18,3 @@
 (package-refresh-contents)
 (package-install 'http-post-simple)
 
-(load-file "ipfs-test.el")
-(load-file "ipfs-integ-test.el")
-
-(ert-run-tests-batch-and-exit)

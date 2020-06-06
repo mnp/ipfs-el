@@ -10,26 +10,37 @@ on:
   pull_request:
     branches: [ master ]
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
-  build:
-    # The type of runner that the job will run on
+  infra:
     runs-on: ubuntu-latest
+    services:
+      ipfs:
+        image: ipfs/go-ipfs
+        ports:
+          - 5001:5001
+          - 8080:8080
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
+  test:
+    runs-on: ubuntu-latest
     steps:
-    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     - uses: actions/checkout@v2
-
-    # Runs a single command using the runners shell
-    - name: Run a one-line script
-      run: echo Hello, world!
-
-    # Runs a set of commands using the runners shell
-    - name: Run a multi-line script
+    - name: install emacs and test deps
       run: |
-        sudo apt-get install -y emacs docker docker-compose
-        docker-compose up -d
-        docker ps
-        emacs --batch -l run-all-tests.el  
+          apt-get update
+          apt-get install -y emacs
+          emacs --batch -l install-dependencies.el
+
+    - name: unit tests
+      run: |        
+          emacs --batch -L . --eval '(progn (setq package-user-dir default-directory) (package-initialize))' -l ipfs-test  > output.txt 2>&1
+
+    - name: integ tests
+      run: |        
+          emacs --batch -L . --eval '(progn (setq package-user-dir default-directory) (package-initialize))' -l ipfs-integ-test  >> output.txt 2>&1
+
+    - name: Upload result
+      uses: actions/upload-artifact@v1
+      with:
+        name: test output
+        path: output.txt
+
