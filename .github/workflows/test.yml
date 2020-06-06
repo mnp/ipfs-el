@@ -26,8 +26,7 @@ jobs:
     - uses: actions/checkout@v2
     - name: install emacs and test deps
       run: |
-          apt-get update
-          apt-get install -y emacs
+          sudo apt-get install -y emacs
           emacs --batch -l install-dependencies.el
 
     - name: unit tests
