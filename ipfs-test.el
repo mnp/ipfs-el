@@ -3,8 +3,6 @@
 (require 'ert)
 (require 'ipfs)
 
-ipfs-mode
-
 (ert-deftest enable-disable ()
   (let ((saved ipfs-mode))
     ;; start with none

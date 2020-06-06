@@ -136,7 +136,7 @@
   "ipfs"      ;; The indicator for the mode line.
   nil	      ;; The minor mode bindings.
   :group 'ipfs
-  :after-hook (if dispwatch-mode
+  :after-hook (if ipfs-mode
 		  (ipfs-enable)
 		  (ipfs-disable)))
 

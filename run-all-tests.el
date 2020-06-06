@@ -1,13 +1,21 @@
 (require 'package)
+;(setq debug-on-error t)
 
-(setq package-archives '(("gnu" . "https://elpa.gnu.org/packages/")
-                          ("melpa" . "https://melpa.org/packages/")))
+(add-to-list 'load-path default-directory)
+
+;; add melpa stable
+(add-to-list 'package-archives
+         '("melpa-stable" . "https://stable.melpa.org/packages/"))
+
+;; add melpa
+(add-to-list 'package-archives
+         '("melpa" . "http://melpa.milkbox.net/packages/"))
+
 (package-initialize)
-
+(package-refresh-contents)
 (package-install 'http-post-simple)
-(require 'http-post-simple)
 
-(require 'ert)
-(require 'ipfs)
+(load-file "ipfs-test.el")
+(load-file "ipfs-integ-test.el")
 
-(ert t)
+(ert-run-tests-batch-and-exit)
