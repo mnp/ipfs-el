@@ -29,7 +29,7 @@ jobs:
     # Runs a set of commands using the runners shell
     - name: Run a multi-line script
       run: |
-        sudo apt-get install -y emacs docker
-        docker run -d ipfs/go-ipfs
+        sudo apt-get install -y emacs docker docker-compose
+        docker-compose up -d
         docker ps
         emacs --batch -l run-all-tests.el  
