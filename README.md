@@ -1,6 +1,7 @@
 # Emacs IPFS Project
 
 [![badge](https://img.shields.io/badge/maturity-ideation-yellow.svg)](https://shields.io/)
+![tests](https://github.com/mnp/ipfs-el/workflows/tests/badge.svg?event=push)
 
 This project will create an Elisp package `ipfs-el` to access IPFS nodes, both with the [IPFS API
 protocol](https://docs.ipfs.io/reference/api/http) as well as [retrieve-only HTTP
