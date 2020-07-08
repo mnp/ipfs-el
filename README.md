@@ -59,7 +59,10 @@ This will be the initial focus of this project.
 
 A personal interest of mine. Immutable, composable, content addressable chunks of code can be assembled into
 larger structures. In case you write the exact same normalized code as someone else, it will have the same
-CID and be de-duped. Explore in Elisp.
+CID and be de-duped. Explore in Elisp, using byte-compile to normalize, although its scoping allows external
+references (globals) which make it difficult to think about reusing any functions. 
+
+A more general route would be to store bytecode such as JVM, WASM, or LLVM.
 
 # Roadmap
 

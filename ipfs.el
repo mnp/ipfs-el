@@ -9,6 +9,7 @@
 ;; TODO: Augment or reformat?: melpa.org/packages/archive-contents file, created by melpa repo Makefile
 
 (require 'http-post-simple)
+(require 'ol)
 (require 'url-http)
 (require 'json)
 
@@ -166,34 +167,29 @@ the arguments that would have been passed to OPERATION."
 
 ;; works
 ;; (insert-file-contents "/ipfs/QmVeAzDB73nzB8aYrTtkrqQfPKxEr56jPfTVB21UsdNAMp")
+;; (ipfs-open-link "/ipfs/QmVeAzDB73nzB8aYrTtkrqQfPKxEr56jPfTVB21UsdNAMp")
 
+
+(defun ipfs-open-link (path)
+  (let ((buf (get-buffer-create "*View IPFS*")))
+    (with-current-buffer buf
+      (let ((inhibit-read-only t))
+        (erase-buffer)
+        (insert (ipfs-cat path))
+        (goto-char (point-min))))
+    (view-buffer buf)))
 
 (defun ipfs-enable ()
   "Install IPFS magic file handlers."
-  (add-to-list 'file-name-handler-alist (cons ipfs-file-handler-regexp #'ipfs-file-handler)))
+  (add-to-list 'file-name-handler-alist (cons ipfs-file-handler-regexp #'ipfs-file-handler))
+  (org-link-set-parameters "ipfs" :follow #'ipfs-open-link)
+  (org-link-make-regexps))
 
 (defun ipfs-disable ()
   "Remove IPFS magic file handlers."
-  (delete (rassoc #'ipfs-file-handler file-name-handler-alist) file-name-handler-alist))
+  (setq file-name-handler-alist (delete (rassoc #'ipfs-file-handler file-name-handler-alist) file-name-handler-alist))
+  ;; there's no corresponding org-link-remove-parameters but it might look like this
+  (setq org-link-parameters (delete (assoc  "ipfs" org-link-parameters) org-link-parameters))
+  (org-link-make-regexps))
 
-
-;;; Package Manager
- 
-(defvar ipfs-upstream-url "https://melpa.org/packages/archive-contents"
-  "Location of upstream package index.")
-
-(defun ipfs-fetch-upstream ()
-  "Retreive upstream archive-contents and return it as a list."
-  (with-current-buffer
-    (url-retrieve-synchronously ipfs-upstream-url)
-    (goto-char (point-min))
-    (re-search-forward "^$")
-    (let ((fetched (read (current-buffer))))
-      (kill-buffer (current-buffer))
-      (if (and fetched (listp fetched) (eq 1 (car fetched)))
-          (progn 
-            (message "Retrieved %s packages from %s" (length (cdr fetched)) ipfs-upstream-url)
-            fetched)
-        (error "Bad read from %s" ipfs-upstream-url)))))
-                                 
 (provide 'ipfs)
